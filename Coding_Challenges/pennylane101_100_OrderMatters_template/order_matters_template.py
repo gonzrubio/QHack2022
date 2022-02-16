@@ -6,7 +6,8 @@ from pennylane import numpy as np
 
 
 def compare_circuits(angles):
-    """Given two angles, compare two circuit outputs that have their order of operations flipped: RX then RY VERSUS RY then RX.
+    """Given two angles, compare two circuit outputs that have their order of
+    operations flipped: RX then RY VERSUS RY then RX.
 
     Args:
         - angles (np.ndarray): Two angles
@@ -17,7 +18,27 @@ def compare_circuits(angles):
 
     # QHACK #
 
-    # define a device and quantum functions/circuits here
+    # define a device
+    dev1 = qml.device("default.qubit", wires=1)
+
+    # quantum functions/circuits
+    @qml.qnode(dev1)
+    def circuit1(params):
+        qml.RX(angles[0], wires=0)
+        qml.RY(angles[1], wires=0)
+        return qml.expval(qml.PauliX(0))
+
+
+    dev2 = qml.device("default.qubit", wires=1)
+
+    @qml.qnode(dev2)
+    def circuit2(params):
+        qml.RY(angles[1], wires=0)
+        qml.RX(angles[0], wires=0)
+        return qml.expval(qml.PauliX(0))
+
+
+    return np.abs(circuit1(angles) - circuit2(angles))
 
     # QHACK #
 
